@@ -1,0 +1,130 @@
+<!-- 
+	API key : Publishable API Token: pk_1a7056c8c06e418b895992a036eda0c1 
+	Company : IEX Cloud 
+-->
+
+<!doctype html>
+<html>
+<head>
+	<title>Stock API</title>
+	<meta charset="utf-8"/>
+
+	<style>
+		body {padding: 0px 15px 10px 15px; font-size: 20px;}
+		h1 {text-align: center; font-size: 30px;}
+		a {text-decoration: none;
+			font-size: 15px;
+			color: navy;
+			box-sizing: border-box; 
+			border: 2px solid grey; 
+			border-radius: 3px;
+			background-color: #f2f2f2;;
+			padding: 5px;}
+		input {font-size: 20px;}
+
+		p {font-size: 17px;}
+
+		a:hover, button:hover {opacity: 0.7;}
+
+	</style>
+	<script>
+		function getSymbols() {
+
+			// Make instance of request object to make HTTP request after page is loaded
+			request = new XMLHttpRequest();
+ 
+			// Set the URL for the AJAX request to get the JSON file */
+			request.open("GET", "https://cloud.iexapis.com/stable/ref-data/symbols?filter=symbol&token=pk_1a7056c8c06e418b895992a036eda0c1", true);
+
+ 
+			// Set up event handler/callback
+			request.onreadystatechange = function() {
+				if (request.readyState == 4 && request.status == 200) {
+					result = request.responseText;
+					symbols = JSON.parse(result);
+
+					// Generate data lists options for the form
+					str = "Stock-Symbol: <input list='symbols' name='symbol'>";
+					str += "<datalist id='symbols'>";
+					for (i = 0; i < symbols.length; i++) {
+						str += "<option value = '" + symbols[i]["symbol"] + "'>"
+					}
+					str += "</datalist><input type='button' value='Get Info' onclick='getData();'>";
+					document.getElementById("stocks").innerHTML = str; 
+					
+				}
+				else if (request.readyState == 4 && request.status != 200) {
+					document.getElementById("data").innerHTML = "Something is wrong!  Check the logs to see where this went off the rails";
+				}
+			}
+
+		// Fire off the HTTP request
+			request.send();
+		}
+
+	</script>
+</head>
+
+
+<body onload="getSymbols()">
+
+	<h1>Stock Data</h1>
+
+	<form id="stocks"></form>
+
+	<div id="data">&nbsp;</div>
+	<a href="https://iexcloud.io">Data provided by IEX Cloud</a>
+
+	<p> API selected is IEX Cloud. The API provides an extensive quantity of institutional grade data, including fundamentals, ownership, international equities, mutual funds, options, real-time data, and alternative data. </p>
+
+	<p> The API was found on Github through the following link: "https://github.com/public-apis/public-apis" </p>
+
+	<p> GET option within an XMLHttpREquest was used to retrive the API data </p>
+
+	<p> This API will be helpful in an application that provides information about stocks, application used to provide financial economic data, or an application that is used to research companiea and their stock holdings. </p>
+
+	<script>
+		function getData() {
+
+			// Make instance of request object to make HTTP request after page is loaded
+			request = new XMLHttpRequest();
+
+			// Retrieve user input 
+			user_input = document.forms[0].symbol.value
+
+			// Set the URL for the AJAX request
+			url = "https://cloud.iexapis.com/stable/stock/";
+			url += user_input;
+			url += "/quote?token=pk_1a7056c8c06e418b895992a036eda0c1";
+ 
+			// Request the JSON file */
+			request.open("GET", url, true);
+ 
+			// Set up event handler/callback
+			request.onreadystatechange = function() {
+				if (request.readyState == 4 && request.status == 200) {
+					result = request.responseText;
+					stock = JSON.parse(result);
+					str = "<p><b> Company Name:</b> " + stock["companyName"] + "</p>";
+					str += "<p><b> Primary Exchange:</b> " + stock["primaryExchange"] + "</p>";
+					str += "<p><b> Open Price:</b> $" + stock["open"] + "</p>";
+					str += "<p><b> Close Price:</b> $" + stock["close"] + "</p>";
+					str += "<p><b> Latest Price:</b> $" + stock["latestPrice"] + "</p>";
+					str += "<p><b> Latest Time:</b> " + stock["latestTime"] + "</p>";
+					str += "<p><b> Latest Trade Volume:</b> " + stock["latestVolume"] + "</p>";
+					document.getElementById("data").innerHTML = str; 
+					
+				}
+				else if (request.readyState == 4 && request.status != 200) {
+					document.getElementById("data").innerHTML = "Something is wrong!  Check the logs to see where this went off the rails";
+
+				}
+			}
+
+		// Fire off the HTTP request
+			request.send();
+		}
+	</script>
+
+</body>
+</html>
